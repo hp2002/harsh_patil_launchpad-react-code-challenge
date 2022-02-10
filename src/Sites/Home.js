@@ -1,49 +1,85 @@
-import { React, useEffect } from 'react';
-import { actionCreate } from '../Actions';
-import { createStore } from 'redux';
+import { React, useEffect, useState } from 'react';
+import { actionCreate, actionDelete, actionSearch, fetchPosts} from '../Actions';
+import { applyMiddleware, createStore} from 'redux';
+import { Provider, useSelector, useDispatch } from 'react-redux';
+import thunk from 'redux-thunk';
 import '../CSS/Home.css'
 
 function reducer (state=[], action) {
   switch(action.type) {
-    case "CREATE": return [...state, {
-      userId: 1,
-      id: action.payload.id,
-      title: action.payload.title,
-      body: action.payload.body,
-    }]
-    // case "REMOVE":
-    // case "UPDATE":
-    // case "DELETE":
+    case "GET": return action.payload
+    case "CREATE" : {
+        const data = action.payload;
+        return([...state , actionCreate(data.id, data.title, data.body)])
+    }
+    case "DELETE" : {
+        return state.filter(ele => ele.id != action.payload.id);
+    }
+
     default: return state
   };
 }
-const store = createStore(reducer);
-let dataRecieved = false;
 
-function Capitalize(string) {
+const store = createStore(reducer, applyMiddleware(thunk));
+
+function capitalize(string) {
     const str = string;
     const str2 = str.charAt(0).toUpperCase() + str.slice(1);
-    return str2 ;
+    return str2;
 }
 
+function SearchBar() {
+
+    function handleSearch(e) {
+        e.preventDefault();  
+    }
+
+    return(
+        <form className='search' onSubmit={handleSearch}>
+            <input className='search-field' type="field" placeholder='Search by ID...'></input>
+            <button type = "submit" className='post-button'>Search</button>
+        </form>
+        
+    )
+}
+
+
+
 function Elements() {
-    const arr = store.getState();
-    const listItems = arr.map((val, index)=> (
-            <li key={val.id} className='post'>
+    const arr = useSelector(state => state);
+    const dispatch = useDispatch();
 
-                <div className='post-heading'>
-                    {Capitalize(val.title)}
-                </div>
 
-                <div className='post-body'>
-                    {Capitalize(val.body)}
-                </div>
+    useEffect(()=> {
+        dispatch(fetchPosts());
+    }, [])
 
-                <div className='post-id'>
-                    ID: {val.id}
-                </div>
+    function handleDelete(e) {
+        dispatch(actionDelete(e.target.value));
+        console.log(e.target.value)
+    }
 
-            </li>
+    function handleEdit(e) {
+        console.log("Editting post " + e.target.value);
+    }
+    
+    const listItems = arr.map((val)=> (
+        <li key={val.id} className='post'>
+            <button className='post-button' onClick={handleDelete} value={val.id}>Remove</button>
+            <button className='post-button' onClick={handleEdit} value={val.id}>Edit</button>
+            <div className='post-heading'>
+                {capitalize(val.title)}
+            </div>
+
+            <div className='post-body'>
+                {capitalize(val.body)}
+            </div>
+
+            <div className='post-id'>
+                ID: {val.id}
+            </div>
+
+        </li>
         )
     )
     return(
@@ -53,26 +89,11 @@ function Elements() {
 
 
 export default function Home() {
-useEffect(()=> {
-    if(!dataRecieved) {
-        fetch('https://jsonplaceholder.typicode.com/posts?_start=0&_limit=20')
-        .then(response=>response.json())
-        .then(data=>{
-            for(let i=0; i<data.length; i++) {
-                const action = actionCreate(data[i].id, data[i].title, data[i].body);
-                store.dispatch(action);
-            }
-        });
-        dataRecieved=true;
-    }
-    console.log(store.getState())
-    
-    });
-
     return (
-        <div>
-            <h2 className='site-heading'>Homepage</h2>
+        <Provider store={store}>
+            <SearchBar />
+            <h2 className='site-heading'>Posts</h2>
             <Elements />
-        </div>
+        </Provider>
     )
 }
