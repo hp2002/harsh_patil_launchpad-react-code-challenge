@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import './CSS/index.css';
 import App from './App';
-import {BrowserRouter} from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 import reportWebVitals from './reportWebVitals';
-import { Route, Routes } from 'react-router-dom';
-import Home from './Home';
+import { createStore } from 'redux';
+import Home from './Sites/Home';
 
 ReactDOM.render(
   <BrowserRouter>

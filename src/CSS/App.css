@@ -1,0 +1,6 @@
+.heading {
+  display: flex;
+  justify-content: center;
+  font-family: monospace;
+  color: #23395b;
+}
