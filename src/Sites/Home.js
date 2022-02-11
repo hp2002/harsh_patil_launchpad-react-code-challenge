@@ -15,12 +15,16 @@ function reducer (state=[], action) {
     case "DELETE" : {
         return state.filter(ele => ele.id != action.payload.id);
     }
+    case "SEARCH" : {
+        return state.filter(ele => ele.id == action.payload.id);
+    }
 
     default: return state
   };
 }
 
 const store = createStore(reducer, applyMiddleware(thunk));
+
 
 function capitalize(string) {
     const str = string;
@@ -29,15 +33,23 @@ function capitalize(string) {
 }
 
 function SearchBar() {
+    
+    const dispatch = useDispatch();
 
     function handleSearch(e) {
-        e.preventDefault();  
+        e.preventDefault();
+        if(e.target.value == '') {
+            dispatch(fetchPosts())
+        }
+        else {
+            dispatch(actionSearch(e.target.value));
+        }
+        
     }
 
     return(
-        <form className='search' onSubmit={handleSearch}>
-            <input className='search-field' type="field" placeholder='Search by ID...'></input>
-            <button type = "submit" className='post-button'>Search</button>
+        <form className='search'>
+            <input onChange ={handleSearch} className='search-field' type="field" placeholder='Search by ID...'></input>
         </form>
         
     )
@@ -62,7 +74,6 @@ function Elements() {
     function handleEdit(e) {
         console.log("Editting post " + e.target.value);
     }
-    
     const listItems = arr.map((val)=> (
         <li key={val.id} className='post'>
             <button className='post-button' onClick={handleDelete} value={val.id}>Remove</button>
@@ -86,8 +97,7 @@ function Elements() {
         <ul>{listItems}</ul>
     )
 }
-
-
+    
 export default function Home() {
     return (
         <Provider store={store}>

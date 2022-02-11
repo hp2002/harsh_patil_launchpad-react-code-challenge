@@ -39,4 +39,17 @@ export function actionDelete(id) {
     
 }
 
+export function actionSearch(id) {
+
+    return(async (dispatch) => {
+        dispatch({
+            type: "SEARCH",
+            payload: {
+                id
+            }
+        })
+    })
+    
+}
+
 
