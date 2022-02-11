@@ -3,6 +3,7 @@ import { actionCreate, actionDelete, actionSearch, fetchPosts} from '../Actions'
 import { applyMiddleware, createStore} from 'redux';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import thunk from 'redux-thunk';
+import Modal from './Modal';
 import '../CSS/Home.css'
 
 function reducer (state=[], action) {
@@ -16,9 +17,9 @@ function reducer (state=[], action) {
         return state.filter(ele => ele.id != action.payload.id);
     }
     case "SEARCH" : {
-        return state.filter(ele => ele.id == action.payload.id);
+        return [action.payload];
     }
-
+    
     default: return state
   };
 }
@@ -38,19 +39,19 @@ function SearchBar() {
 
     function handleSearch(e) {
         e.preventDefault();
+
         if(e.target.value == '') {
             dispatch(fetchPosts())
         }
         else {
             dispatch(actionSearch(e.target.value));
         }
-        
     }
 
     return(
-        <form className='search'>
+        <div className='search'>
             <input onChange ={handleSearch} className='search-field' type="field" placeholder='Search by ID...'></input>
-        </form>
+        </div>
         
     )
 }
@@ -61,6 +62,8 @@ function Elements() {
     const arr = useSelector(state => state);
     const dispatch = useDispatch();
 
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [addButtonText, setAddButtonText] = useState("+ Add Post");
 
     useEffect(()=> {
         dispatch(fetchPosts());
@@ -68,7 +71,17 @@ function Elements() {
 
     function handleDelete(e) {
         dispatch(actionDelete(e.target.value));
-        console.log(e.target.value)
+        console.log(e.target.value);
+    }
+    
+    function handleAdd(e) {
+        setModalIsOpen(!modalIsOpen);
+        if(!modalIsOpen) {
+            setAddButtonText("Cancel");
+        }
+        else {
+            setAddButtonText("+ Add Post");
+        }
     }
 
     function handleEdit(e) {
@@ -93,8 +106,12 @@ function Elements() {
         </li>
         )
     )
-    return(
-        <ul>{listItems}</ul>
+    return( <div>
+            <button className='add-post-button' onClick={handleAdd}>{addButtonText}</button>
+            {modalIsOpen && <Modal/>}
+            <ul>{listItems}</ul>
+            </div>
+            
     )
 }
     

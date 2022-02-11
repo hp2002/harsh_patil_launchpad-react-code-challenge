@@ -40,13 +40,12 @@ export function actionDelete(id) {
 }
 
 export function actionSearch(id) {
-
+    
     return(async (dispatch) => {
+        const response = await axios.get(URL + id);
         dispatch({
             type: "SEARCH",
-            payload: {
-                id
-            }
+            payload: response.data,
         })
     })
     
