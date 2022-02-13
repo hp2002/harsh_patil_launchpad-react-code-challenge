@@ -1,5 +1,5 @@
 import { React, useEffect, useState } from 'react';
-import { actionCreate, actionDelete, actionSearch, fetchPosts} from '../Actions';
+import { actionEdit, actionDelete, actionSearch, fetchPosts, actionCreate} from '../Actions';
 import { applyMiddleware, createStore} from 'redux';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import thunk from 'redux-thunk';
@@ -11,7 +11,18 @@ function reducer (state=[], action) {
     case "GET": return action.payload
     case "CREATE" : {
         const data = action.payload;
-        return([...state , actionCreate(data.id, data.title, data.body)])
+        return([...state , {
+            id:data.id, 
+            title:data.title, 
+            body: data.body}])
+    }
+    case "EDIT" : {
+        const data = state.filter(ele => ele.id != action.payload.id);
+        return([...data, {
+            id: action.payload.id,
+            title: action.payload.title,
+            body: action.payload.body,
+        }]);
     }
     case "DELETE" : {
         return state.filter(ele => ele.id != action.payload.id);
@@ -24,8 +35,8 @@ function reducer (state=[], action) {
   };
 }
 
-const store = createStore(reducer, applyMiddleware(thunk));
-
+export const store = createStore(reducer, applyMiddleware(thunk));
+let lastId = 20;
 
 function capitalize(string) {
     const str = string;
@@ -71,7 +82,7 @@ function Elements() {
 
     function handleDelete(e) {
         dispatch(actionDelete(e.target.value));
-        console.log(e.target.value);
+        alert("Post ID: " + e.target.value + " removed!");
     }
     
     function handleAdd(e) {
@@ -85,8 +96,27 @@ function Elements() {
     }
 
     function handleEdit(e) {
-        console.log("Editting post " + e.target.value);
+        const id = e.target.value;
+        const post = store.getState()[id-1];
+        const defaultTitle = "<Untitled>"
+        const defaultBody = "<No Body>";
+        let newTitle = prompt("Enter the new title", defaultTitle);
+        let newBody = prompt("Enter a body",defaultBody);
+
+        if( newTitle == null || newTitle == "" ) {
+            console.log("Title null");
+            newTitle = defaultTitle;
+        }
+        if( newBody == null || newBody == "") {
+            console.log("Body null");
+            newBody = defaultBody;
+        }
+        console.log(store.getState()[e.target.value-1]);
+        dispatch(actionEdit(e.target.value, newTitle, newBody));
+        
     }
+
+
     const listItems = arr.map((val)=> (
         <li key={val.id} className='post'>
             <button className='post-button' onClick={handleDelete} value={val.id}>Remove</button>
@@ -108,11 +138,10 @@ function Elements() {
     )
     return( <div>
             <button className='add-post-button' onClick={handleAdd}>{addButtonText}</button>
-            {modalIsOpen && <Modal/>}
+            {modalIsOpen && <Modal isOpen={handleAdd}/>}
             <ul>{listItems}</ul>
             </div>
-            
-    )
+            )
 }
     
 export default function Home() {
