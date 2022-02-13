@@ -26,13 +26,14 @@ function Dropdown(props) {
 }
 
 function UniList(props) {
+    
     const mappedUnis = props.options.map((ele, index)=>{
         return <li className='uni-element' key={index}>{ele.name}</li>
     })
 
     return(
-            <div>
-            {props.update()}
+            <div className='uni-list'>
+                {props.update()}
                 {mappedUnis}
             </div>
         )
@@ -65,7 +66,7 @@ export default function Universities() {
         <div>
             <button onClick={()=> setMenuIsOpen(!menuIsOpen)}className='selection-button'>+ Select a Country</button>
             {menuIsOpen && <Dropdown options={countries} assignSelection={assignSelection}/>}
-            <h2> Universities in {selection}</h2>
+            <h2 style={{margin: "10px"}}> Universities in {selection}</h2>
             <UniList options={universities} update={update}/>
         </div>
     )
