@@ -33,7 +33,6 @@ function UniList(props) {
 
     return(
             <div className='uni-list'>
-                {props.update()}
                 {mappedUnis}
             </div>
         )
@@ -59,7 +58,8 @@ export default function Universities() {
         fetch(URL_COUNTRIES_INFO).then(response=>response.json())
         .then((json)=>json["data"])
         .then(res=>{setCountries(res)})
-    },[])
+        update();
+    },[selection])
 
 
     return (
