@@ -2,10 +2,10 @@ import './CSS/App.css';
 import { actionCreate } from './Actions';
 import React, { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import PostalLookup from './Sites/PostalLookup';
-import Universities from './Sites/Universities';
-import Navbar from './Sites/Navbar';
-import Home from './Sites/Home';
+import PostalLookup from './Components/PostalLookup';
+import Universities from './Components/Universities';
+import Navbar from './Components/Navbar';
+import Home from './Components/Home';
 
 function App() {
  
